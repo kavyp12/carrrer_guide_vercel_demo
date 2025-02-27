@@ -1,4 +1,4 @@
-// E:\career-guide - Copy\API\auth.js
+// E:\career-guide - Copy\api\auth.js
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('./models/User.js');
@@ -8,16 +8,16 @@ const axios = require('axios');
 const cors = require('cors'); // Ensure cors is installed
 
 module.exports = async (req, res) => {
-  // Enable CORS for localhost:3000
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  // Enable CORS for localhost:3000 and Vercel domain
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000, https://career-guide-copy.vercel.app');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   try {
     await connectDB(); // Connect to database
 
-    // Handle /signup (POST) with full path
-    if (req.url === '/API/auth/signup' && req.method === 'POST') { // Updated to match full path
+    // Handle /signup (POST) with full path (lowercase api)
+    if (req.url === '/api/auth/signup' && req.method === 'POST') { // Updated to lowercase /api/
       console.log('Signup request URL:', req.url);
       console.log('Signup request body:', req.body);
       const { body } = req;
@@ -57,8 +57,8 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Handle /analyze (POST) with full path
-    if (req.url === '/API/auth/analyze' && req.method === 'POST') { // Updated to match full path
+    // Handle /analyze (POST) with full path (lowercase api)
+    if (req.url === '/api/auth/analyze' && req.method === 'POST') { // Updated to lowercase /api/
       verifyToken(req, res, async () => {
         if (!req.user) {
           return res.status(401).json({ message: 'Unauthorized' });
@@ -72,7 +72,7 @@ module.exports = async (req, res) => {
 
           const answers = req.body.answers;
 
-          const response = await axios.post('/API/submit-assessment', {
+          const response = await axios.post('/api/submit-assessment', { // Updated to lowercase /api/
             answers,
             studentInfo: {
               name: `${user.firstName} ${user.lastName}`,
@@ -93,8 +93,8 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Handle /login (POST) with full path
-    if (req.url === '/API/auth/login' && req.method === 'POST') { // Updated to match full path
+    // Handle /login (POST) with full path (lowercase api)
+    if (req.url === '/api/auth/login' && req.method === 'POST') { // Updated to lowercase /api/
       const { email, password } = req.body;
 
       User.findOne({ email })
@@ -137,8 +137,8 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Handle /profile (GET) with full path
-    if (req.url === '/API/auth/profile' && req.method === 'GET') { // Updated to match full path
+    // Handle /profile (GET) with full path (lowercase api)
+    if (req.url === '/api/auth/profile' && req.method === 'GET') { // Updated to lowercase /api/
       verifyToken(req, res, () => {
         if (!req.user) {
           return res.status(401).json({ message: 'Unauthorized' });
