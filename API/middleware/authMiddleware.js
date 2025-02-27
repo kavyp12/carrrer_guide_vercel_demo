@@ -1,8 +1,6 @@
-// api/middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 
 function extendRequest(req) {
-  // Create a simple object to mimic Express Request with user property
   return {
     ...req,
     user: undefined,

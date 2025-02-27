@@ -18,9 +18,7 @@ const userSchema = new mongoose.Schema({
     enum: ['Pending', 'Analyzing', 'Report Generated', 'Error'],
     default: 'Pending'
   },
-  reportPath: { 
-    type: String 
-  }
+  reportPath: { type: String }
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {

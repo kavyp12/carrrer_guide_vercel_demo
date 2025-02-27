@@ -96,7 +96,7 @@ class handler(BaseHTTPRequestHandler):
 
             # Initialize GitHub client
             g = Github(github_token)
-            repo = g.get_repo('kavyp12/career-guide')  # Replace with your GitHub repo (e.g., 'username/repo')
+            repo = g.get_repo('kavyp12/carrrer_guide_vercel_demo')  # Replace with your GitHub repo (e.g., 'username/repo')
 
             # Create or get the latest release
             releases = repo.get_releases()
@@ -113,7 +113,7 @@ class handler(BaseHTTPRequestHandler):
             headers = {'Authorization': f'token {github_token}'}
             files = {'file': (pdf_filename, BytesIO(pdf_content), 'application/pdf')}
             response = requests.post(
-                f"https://uploads.github.com/repos/kavyp12/career-guide/releases/{release.id}/assets?name={pdf_filename}",
+                f"https://uploads.github.com/repos/kavyp12/carrrer_guide_vercel_demo/releases/{release.id}/assets?name={pdf_filename}",
                 headers=headers,
                 files=files
             )
