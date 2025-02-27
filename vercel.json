@@ -1,0 +1,49 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "api/*.js",
+        "use": "@vercel/node"
+      },
+      {
+        "src": "api/gemini.py",
+        "use": "@vercel/python"
+      },
+      {
+        "src": "package.json",
+        "use": "@vercel/vite"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/auth/(.*)",
+        "dest": "/api/auth.js"
+      },
+      {
+        "src": "/api/marks",
+        "dest": "/api/marks.js"
+      },
+      {
+        "src": "/api/questionnaire/(.*)",
+        "dest": "/api/questionnaire.js"
+      },
+      {
+        "src": "/api/submit-assessment",
+        "dest": "/api/gemini.py"
+      },
+      {
+        "src": "/api/download-report/(.*)",
+        "dest": "/api/gemini.py"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/index.html"
+      }
+    ],
+    "env": {
+      "JWT_SECRET": "@jwt_secret",
+      "MONGO_URI": "@mongo_uri",
+      "GOOGLE_API_KEY": "@google_api_key",
+      "GOOGLE_STORAGE_BUCKET": "@google_storage_bucket"
+    }
+  }
