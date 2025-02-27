@@ -1,11 +1,19 @@
 // E:\career-guide - Copy\api\auth.js
 const jwt = require('jsonwebtoken');
+<<<<<<< HEAD
+const bcrypt = require('bcryptjs');
+const User = require(__dirname + '/models/User');
+const { verifyToken } = require(__dirname + '/middleware/authMiddleware');
+const { connectDB } = require(__dirname + '/db');
+const axios = require('axios'); // Add axios for HTTP requests
+=======
 const bcrypt = require('bcrypt');
 const User = require('./models/User.js');
 const { verifyToken } = require('./middleware/authMiddleware.js');
 const { connectDB } = require('./db.js');
 const axios = require('axios');
 const cors = require('cors'); // Ensure cors is installed
+>>>>>>> d802d502c943e203e6c287da618ea6d8fc4c225c
 
 module.exports = async (req, res) => {
   // Enable CORS for localhost:3000 and Vercel domain
