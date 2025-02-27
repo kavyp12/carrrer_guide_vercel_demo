@@ -11,9 +11,13 @@
   },
   "dependencies": {
     "@types/react-router-dom": "^5.3.3",
-    "axios": "^1.7.9",
+    "axios": "^1.8.1",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "concurrently": "^9.1.2",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.475.0",
+    "mongoose": "^8.11.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.4.0",
@@ -34,6 +38,6 @@
     "tailwindcss": "^3.4.17",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
-    "vite": "^6.0.5"  
+    "vite": "^6.0.5"
   }
 }

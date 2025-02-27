@@ -1,16 +1,64 @@
+// E:\career-guide - Copy\API\auth.js
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const User = require('../models/User'); // Adjust path based on new structure
-const { verifyToken } = require('../middleware/authMiddleware'); // Adjust path
-const { connectDB } = require('../db'); // Adjust path
-const axios = require('axios'); // Add axios for HTTP requests
+const User = require('./models/User.js');
+const { verifyToken } = require('./middleware/authMiddleware.js');
+const { connectDB } = require('./db.js');
+const axios = require('axios');
+const cors = require('cors'); // Ensure cors is installed
 
 module.exports = async (req, res) => {
+  // Enable CORS for localhost:3000
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
   try {
     await connectDB(); // Connect to database
 
-    // Handle /analyze (POST)
-    if (req.url === '/analyze' && req.method === 'POST') {
+    // Handle /signup (POST) with full path
+    if (req.url === '/API/auth/signup' && req.method === 'POST') { // Updated to match full path
+      console.log('Signup request URL:', req.url);
+      console.log('Signup request body:', req.body);
+      const { body } = req;
+      const academicInfo = `${body.standard}th Grade - ${body.academicPerformance || 'Not specified'}`;
+
+      const user = new User({
+        ...body,
+        password: body.password,
+        academicInfo: academicInfo,
+        studentName: `${body.firstName} ${body.lastName}`
+      });
+
+      try {
+        await user.save();
+        console.log('User saved successfully:', user);
+        const token = jwt.sign(
+          { userId: user._id },
+          process.env.JWT_SECRET,
+          { expiresIn: '24h' }
+        );
+
+        res.status(201).json({
+          token,
+          user: {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            age: user.age,
+            interests: user.interests
+          }
+        });
+      } catch (error) {
+        console.error('Signup error:', error);
+        res.status(500).json({ error: 'Signup failed', details: error.message });
+      }
+      return;
+    }
+
+    // Handle /analyze (POST) with full path
+    if (req.url === '/API/auth/analyze' && req.method === 'POST') { // Updated to match full path
       verifyToken(req, res, async () => {
         if (!req.user) {
           return res.status(401).json({ message: 'Unauthorized' });
@@ -24,12 +72,12 @@ module.exports = async (req, res) => {
 
           const answers = req.body.answers;
 
-          const response = await axios.post('/api/submit-assessment', {
+          const response = await axios.post('/API/submit-assessment', {
             answers,
             studentInfo: {
               name: `${user.firstName} ${user.lastName}`,
               email: user.email,
-              school: user.schoolName,
+              schoolName: user.schoolName,
               grade: user.standard,
               age: user.age,
               interests: user.interests
@@ -45,42 +93,8 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Handle /signup (POST)
-    if (req.url === '/signup' && req.method === 'POST') {
-      const { body } = req;
-      const academicInfo = `${body.standard}th Grade - ${body.academicPerformance || 'Not specified'}`;
-
-      const user = new User({
-        ...body,
-        password: body.password,
-        academicInfo: academicInfo,
-        studentName: `${body.firstName} ${body.lastName}`
-      });
-
-      await user.save();
-
-      const token = jwt.sign(
-        { userId: user._id },
-        process.env.JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-
-      res.status(201).json({
-        token,
-        user: {
-          id: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          age: user.age,
-          interests: user.interests
-        }
-      });
-      return;
-    }
-
-    // Handle /login (POST)
-    if (req.url === '/login' && req.method === 'POST') {
+    // Handle /login (POST) with full path
+    if (req.url === '/API/auth/login' && req.method === 'POST') { // Updated to match full path
       const { email, password } = req.body;
 
       User.findOne({ email })
@@ -123,8 +137,8 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Handle /profile (GET)
-    if (req.url === '/profile' && req.method === 'GET') {
+    // Handle /profile (GET) with full path
+    if (req.url === '/API/auth/profile' && req.method === 'GET') { // Updated to match full path
       verifyToken(req, res, () => {
         if (!req.user) {
           return res.status(401).json({ message: 'Unauthorized' });
