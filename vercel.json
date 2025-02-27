@@ -2,48 +2,55 @@
     "version": 2,
     "builds": [
       {
-        "src": "api/*.js",
+        "src": "API/**/*.js",
         "use": "@vercel/node"
       },
       {
-        "src": "api/gemini.py",
+        "src": "API/**/*.py",
         "use": "@vercel/python"
       },
       {
         "src": "package.json",
-        "use": "@vercel/vite"
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "dist"
+        }
       }
     ],
     "routes": [
       {
         "src": "/api/auth/(.*)",
-        "dest": "/api/auth.js"
+        "dest": "API/auth.js"
       },
       {
         "src": "/api/marks",
-        "dest": "/api/marks.js"
+        "dest": "API/marks.js"
       },
       {
         "src": "/api/questionnaire/(.*)",
-        "dest": "/api/questionnaire.js"
+        "dest": "API/questionnaire.js"
       },
       {
         "src": "/api/submit-assessment",
-        "dest": "/api/gemini.py"
+        "dest": "API/gemini.py"
       },
       {
         "src": "/api/download-report/(.*)",
-        "dest": "/api/gemini.py"
+        "dest": "API/gemini.py"
+      },
+      {
+        "src": "/assets/(.*)",
+        "dest": "/dist/assets/$1"
       },
       {
         "src": "/(.*)",
-        "dest": "/index.html"
+        "dest": "/dist/index.html"
       }
     ],
     "env": {
-      "JWT_SECRET": "@jwt_secret",
-      "MONGO_URI": "@mongo_uri",
-      "GOOGLE_API_KEY": "@google_api_key",
-      "GOOGLE_STORAGE_BUCKET": "@google_storage_bucket"
+      "JWT_SECRET": "3f7a2b5e8d4c9f1a3e7b6d5c8a2f9e4b1c3d6a7f8b2e4c9d5e3f7a1b6c8d2e9",
+      "MONGO_URI": "mongodb+srv://kavypatel255:0hCGk2Gikd95hLgV@career-guide-database.zhgpo.mongodb.net/career-guide",
+      "GOOGLE_API_KEY": "AIzaSyBOhrXZr-4HrjfKuJdfc_6ZoHXNI7Pilj0",
+      "GITHUB_TOKEN": "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"
     }
   }

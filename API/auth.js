@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const User = require('../models/User'); // Adjust path based on new structure
-const { verifyToken } = require('../middleware/authMiddleware'); // Adjust path
-const { connectDB } = require('../db'); // Adjust path
+const bcrypt = require('bcryptjs');
+const User = require(__dirname + '/models/User');
+const { verifyToken } = require(__dirname + '/middleware/authMiddleware');
+const { connectDB } = require(__dirname + '/db');
 const axios = require('axios'); // Add axios for HTTP requests
 
 module.exports = async (req, res) => {
