@@ -7,8 +7,8 @@ module.exports = async (req, res) => {
   try {
     await connectDB();
 
-    // Change this line to check for '/api/marks' instead of just '/marks'
-    if ((req.url === '/api/marks' || req.url === '/marks') && req.method === 'POST') {
+    // Simplify this check - just verify it's a POST request
+    if (req.method === 'POST') {
       verifyToken(req, res, () => {
         if (!req.user?.userId) {
           return res.status(401).json({ error: 'User not authenticated' });
@@ -33,10 +33,9 @@ module.exports = async (req, res) => {
       return;
     }
 
-    res.status(404).json({ error: 'Route not found' });
+    res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
     console.error('Marks route error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-

@@ -31,8 +31,13 @@
       "src": "/api/auth/(.*)",
       "dest": "/api/auth.js"
     },
+
     {
       "src": "/api/marks",
+      "dest": "/api/marks.js"
+    },
+    {
+       "src": "/marks",
       "dest": "/api/marks.js"
     },
     {
