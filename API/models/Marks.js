@@ -1,14 +1,14 @@
-// api/models/Marks.js
+// In your Marks.js model:
 const mongoose = require('mongoose');
 
-const MarksSchema = new mongoose.Schema({
+const marksSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    required: true,
+    ref: 'User'
   },
   subjects: [{
-    subjectName: {
+    subjectName: { // Change from name to subjectName
       type: String,
       required: true
     },
@@ -28,4 +28,4 @@ const MarksSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Marks', MarksSchema);
+module.exports = mongoose.model('Marks', marksSchema);

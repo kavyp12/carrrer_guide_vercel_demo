@@ -1,23 +1,113 @@
-// E:\career-guide - Copy\api\auth.js
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('./models/User.js');
 const { verifyToken } = require('./middleware/authMiddleware.js');
 const { connectDB } = require('./db.js');
 const axios = require('axios');
-const cors = require('cors'); // Ensure cors is installed
+const cors = require('cors');
 
 module.exports = async (req, res) => {
-  // Enable CORS for localhost:3000 and Vercel domain
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000, https://career-guide-copy.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.status(200).end();
+    return;
+  }
+
+  // Enable CORS for all origins
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   try {
     await connectDB(); // Connect to database
 
+    // Handle /profile (GET) endpoint
+    if (req.url === '/api/auth/profile' && req.method === 'GET') {
+      console.log('Profile request received');
+      
+      // Extract token from Authorization header
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('No valid Authorization header found');
+        return res.status(401).json({ message: 'Authentication required' });
+      }
+
+      const token = authHeader.split(' ')[1];
+      console.log('Token for profile:', token);
+
+      try {
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('Token decoded for profile:', decoded);
+        
+        // Find user by ID from token
+        const user = await User.findById(decoded.userId).select('-password');
+        if (!user) {
+          console.log('User not found');
+          return res.status(404).json({ message: 'User not found' });
+        }
+        
+        console.log('User found:', user);
+        res.json({
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          age: user.age,
+          interests: user.interests
+        });
+      } catch (error) {
+        console.error('Profile verification error:', error);
+        if (error.name === 'TokenExpiredError') {
+          return res.status(401).json({ message: 'Token expired' });
+        }
+        res.status(403).json({ message: 'Invalid token' });
+      }
+      return;
+    }
+
+    // Handle /refresh token endpoint
+    if (req.url === '/api/auth/refresh' && req.method === 'POST') {
+      console.log('Refresh token request received');
+      
+      // Extract token from Authorization header
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('No valid Authorization header found');
+        return res.status(401).json({ message: 'Authentication required' });
+      }
+
+      const token = authHeader.split(' ')[1];
+      console.log('Token to refresh:', token);
+
+      try {
+        // Verify the token - even if expired we need the userId
+        const decoded = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
+        console.log('Token decoded for refresh:', decoded);
+        
+        // Generate new token with longer expiration
+        const newToken = jwt.sign(
+          { userId: decoded.userId },
+          process.env.JWT_SECRET,
+          { expiresIn: '7d' } // Extended from 24h to 7d for better persistence
+        );
+        
+        console.log('New token generated');
+        res.json({ token: newToken });
+      } catch (error) {
+        console.error('Token refresh error:', error);
+        res.status(403).json({ message: 'Invalid token' });
+      }
+      return;
+    }
+
     // Handle /signup (POST) with full path (lowercase api)
-    if (req.url === '/api/auth/signup' && req.method === 'POST') { // Updated to lowercase /api/
+    if (req.url === '/api/auth/signup' && req.method === 'POST') {
       console.log('Signup request URL:', req.url);
       console.log('Signup request body:', req.body);
       const { body } = req;
@@ -36,7 +126,7 @@ module.exports = async (req, res) => {
         const token = jwt.sign(
           { userId: user._id },
           process.env.JWT_SECRET,
-          { expiresIn: '24h' }
+          { expiresIn: '7d' } // Extended from 24h to 7d for better persistence
         );
 
         res.status(201).json({
@@ -58,7 +148,7 @@ module.exports = async (req, res) => {
     }
 
     // Handle /analyze (POST) with full path (lowercase api)
-    if (req.url === '/api/auth/analyze' && req.method === 'POST') { // Updated to lowercase /api/
+    if (req.url === '/api/auth/analyze' && req.method === 'POST') {
       verifyToken(req, res, async () => {
         if (!req.user) {
           return res.status(401).json({ message: 'Unauthorized' });
@@ -72,7 +162,7 @@ module.exports = async (req, res) => {
 
           const answers = req.body.answers;
 
-          const response = await axios.post('/api/submit-assessment', { // Updated to lowercase /api/
+          const response = await axios.post('/api/submit-assessment', {
             answers,
             studentInfo: {
               name: `${user.firstName} ${user.lastName}`,
@@ -94,7 +184,7 @@ module.exports = async (req, res) => {
     }
 
     // Handle /login (POST) with full path (lowercase api)
-    if (req.url === '/api/auth/login' && req.method === 'POST') { // Updated to lowercase /api/
+    if (req.url === '/api/auth/login' && req.method === 'POST') {
       const { email, password } = req.body;
 
       User.findOne({ email })
@@ -112,7 +202,7 @@ module.exports = async (req, res) => {
               const token = jwt.sign(
                 { userId: user._id },
                 process.env.JWT_SECRET,
-                { expiresIn: '24h' }
+                { expiresIn: '7d' } // Extended from 24h to 7d for better persistence
               );
 
               res.json({
@@ -134,27 +224,6 @@ module.exports = async (req, res) => {
         .catch(error => {
           res.status(500).json({ message: 'User not found' });
         });
-      return;
-    }
-
-    // Handle /profile (GET) with full path (lowercase api)
-    if (req.url === '/api/auth/profile' && req.method === 'GET') { // Updated to lowercase /api/
-      verifyToken(req, res, () => {
-        if (!req.user) {
-          return res.status(401).json({ message: 'Unauthorized' });
-        }
-
-        User.findById(req.user.userId).select('-password')
-          .then(user => {
-            if (!user) {
-              return res.status(404).json({ message: 'User not found' });
-            }
-            res.json(user);
-          })
-          .catch(error => {
-            res.status(500).json({ message: 'Error fetching profile' });
-          });
-      });
       return;
     }
 

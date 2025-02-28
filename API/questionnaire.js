@@ -1,16 +1,16 @@
-// api/questionnaire.js
-const { verifyToken } = require('../middleware/authMiddleware'); // Adjust path
-const Questionnaire = require('../models/QuestionnaireModel'); // Adjust path
-const User = require('../models/User'); // Adjust path
+// E:\career-guide - Copy\api\questionnaire.js
+const { verifyToken } = require('./middleware/authMiddleware.js'); // Adjust path
+const Questionnaire = require('./models/QuestionnaireModel.js'); // Adjust path
+const User = require('./models/User.js'); // Adjust path
 const axios = require('axios');
-const { connectDB } = require('../db'); // Adjust path
+const { connectDB } = require('./db.js'); // Adjust path
 
 module.exports = async (req, res) => {
   try {
     await connectDB(); // Connect to database
 
-    // Handle /submit-answers (POST)
-    if (req.url === '/submit-answers' && req.method === 'POST') {
+    // Handle /submit-answers (POST) with full path
+    if (req.url === '/api/questionnaire/submit-answers' && req.method === 'POST') {
       verifyToken(req, res, async () => {
         const userId = req.user?.userId;
         
@@ -55,7 +55,8 @@ module.exports = async (req, res) => {
         };
 
         try {
-          const aiResponse = await axios.post('http://localhost:3001/api/submit-assessment', aiServiceData);
+          // Use a fully qualified URL for local development
+          const aiResponse = await axios.post('http://localhost:3000/api/submit-assessment', aiServiceData);
           
           if (aiResponse.data.report_url) {
             const reportPath = aiResponse.data.report_url.split('/').pop();
@@ -86,8 +87,8 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Handle /report-status (GET)
-    if (req.url === '/report-status' && req.method === 'GET') {
+    // Handle /report-status (GET) with full path
+    if (req.url === '/api/questionnaire/report-status' && req.method === 'GET') {
       verifyToken(req, res, async () => {
         const userId = req.user?.userId;
         
@@ -108,8 +109,8 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Handle /get-answers (GET)
-    if (req.url === '/get-answers' && req.method === 'GET') {
+    // Handle /get-answers (GET) with full path
+    if (req.url === '/api/questionnaire/get-answers' && req.method === 'GET') {
       verifyToken(req, res, async () => {
         const userId = req.user?.userId;
         

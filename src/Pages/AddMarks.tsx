@@ -667,20 +667,21 @@ const MarksEntry = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/api/marks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          subjects: subjects.map(subject => ({
-            subjectName: subject.subjectName.trim(),
-            marks: parseInt(subject.marks),
-            totalMarks: parseInt(subject.totalMarks)
-          }))
-        }),
-      });
+      // Change this line in the handleSubmit function:
+const response = await fetch('http://localhost:3000/marks', { // Remove the /api prefix
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+  body: JSON.stringify({
+    subjects: subjects.map(subject => ({
+      subjectName: subject.subjectName.trim(),
+      marks: parseInt(subject.marks),
+      totalMarks: parseInt(subject.totalMarks)
+    }))
+  }),
+});
 
       if (response.ok) {
         navigate('/questionnaire');

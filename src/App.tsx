@@ -1,6 +1,6 @@
-// App.tsx
+// src/App.tsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
@@ -10,10 +10,21 @@ import Dashboard from './Pages/Dashboard';
 import { useAuth } from './context/AuthContext';
 import AddMarks from './Pages/AddMarks';
 import Landingpage from './lanidingpage/Landingpage';
+
 // Protected Route wrapper component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return <div>Loading...</div>; // Show loading state while verifying token
+  }
+
+  return isAuthenticated ? (
+    <>{children}</>
+  ) : (
+    <Navigate to="/login" replace state={{ from: location.pathname }} />
+  );
 };
 
 const App: React.FC = () => {

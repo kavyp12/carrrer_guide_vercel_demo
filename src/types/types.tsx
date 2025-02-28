@@ -31,10 +31,10 @@ export type UserStatus = 'pending' | 'test_done' | 'report_generated' | 'formatt
 
 export interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (userData: Omit<User, 'id' | 'status'> & { password: string }) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
+  signup: (userData: Omit<User, 'id' | 'status'> & { password: string }) => Promise<boolean>;
   logout: () => void;
-  refreshUser: () => Promise<void>;
+  refreshUser: () => Promise<boolean>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   loading: boolean;

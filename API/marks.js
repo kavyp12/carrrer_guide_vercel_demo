@@ -1,13 +1,14 @@
 // api/marks.js
-const { verifyToken } = require('../middleware/authMiddleware'); // Adjust path
-const Marks = require('../models/Marks'); // Adjust path
-const { connectDB } = require('../db'); // Adjust path
+const { verifyToken } = require('./middleware/authMiddleware');
+const Marks = require('./models/Marks');
+const { connectDB } = require('./db');
 
 module.exports = async (req, res) => {
   try {
-    await connectDB(); // Connect to database
+    await connectDB();
 
-    if (req.url === '/marks' && req.method === 'POST') {
+    // Change this line to check for '/api/marks' instead of just '/marks'
+    if ((req.url === '/api/marks' || req.url === '/marks') && req.method === 'POST') {
       verifyToken(req, res, () => {
         if (!req.user?.userId) {
           return res.status(401).json({ error: 'User not authenticated' });
@@ -38,3 +39,4 @@ module.exports = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+

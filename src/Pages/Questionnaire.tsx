@@ -1317,8 +1317,18 @@ const Questionnaire: React.FC = () => {
   const submitAnswers = async () => {
     try {
       const token = localStorage.getItem('token');
+      
+      // Convert checkbox arrays to strings
+      const processedAnswers = answers.map(answer => {
+        if (Array.isArray(answer.answer)) {
+          return {
+            questionId: answer.questionId,
+            answer: answer.answer.join(', ')
+          };
+        }
+        return answer;
+      });
   
-      // Submit answers
       const response = await fetch('/api/questionnaire/submit-answers', {
         method: 'POST',
         headers: {
@@ -1326,7 +1336,7 @@ const Questionnaire: React.FC = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          answers,
+          answers: processedAnswers,
         }),
       });
   
